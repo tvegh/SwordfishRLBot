@@ -99,6 +99,7 @@ def steer(angle):
     final = ((10 * angle+sign(angle))**3) / 20
     return cap(final,-1,1)
 
+
 def angle2(target_location,object_location):
     difference = toLocation(target_location) - toLocation(object_location)
     return math.atan2(difference.data[1], difference.data[0])

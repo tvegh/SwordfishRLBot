@@ -2,7 +2,8 @@ import math
 import time
 from rlbot.agents.base_agent import  SimpleControllerState
 from rlbot.utils.structures.game_data_struct import GameTickPacket
-from Util import *
+from util import *
+import swordfish
 
 class calcShot:
     def __init__(self):
@@ -49,7 +50,6 @@ class quickShot:
         return False
 
     def execute(self,agent):
-        print(swordfish.ALL_PLAYERS)
         agent.controller = shotController
         left_post = Vector3([sign(agent.team)*GOAL_WIDTH/2,-sign(agent.team)*FIELD_LENGTH/2,100])
         right_post = Vector3([-sign(agent.team)*GOAL_WIDTH/2,-sign(agent.team)*FIELD_LENGTH/2,100])
@@ -91,19 +91,22 @@ class goForBoost:   #go for boost boost < some value, AND if, distances: from bo
         ballLoc = agent.ball.location
         boostLoc = closestBoost(agent.me)
 
-        botToBoost = distance2D(myLoc, boostLoc)
+        botToBoost = distance2D(boostLoc, myLoc)
         boostToBall = distance2D(boostLoc, ballLoc)
+        botToBall = distance2D(ballLoc, myLoc)
 
         lowestDistanceToBall = 1000000
-        for player in players:
-            print(players[0].name)  #test to see if players is working
+        for player in swordfish.ALL_PLAYERS:
             playerLoc = player.physics.location
-            playerToBall = distance2D(playerLoc, ballLoc)
+            playerVector = [playerLoc.x, playerLoc.y, playerLoc.z]
+            playerToBall = distance2D(ballLoc, playerVector)
             if playerToBall < lowestDistanceToBall:
                 lowestDistanceToBall = playerToBall
                 closestPlayer = player
-        print("Closest player: ", closestPlayer.name)
-        if botToBoost < botToBall and closestPlayer.team == agent.me.team and agent.me.boost < 30:
+        #print("Closest player: ", closestPlayer.name)
+        #print(botToBoost, "||", botToBall)
+        #if botToBoost < botToBall and closestPlayer.team == agent.team and agent.me.boost < 60:
+        if botToBoost < botToBall and closestPlayer.team == agent.team and agent.me.boost < 60:
             return True
         return False
 
@@ -111,9 +114,9 @@ class goForBoost:   #go for boost boost < some value, AND if, distances: from bo
     def execute(self,agent):
         agent.controller = boostController
         target_location = closestBoost(agent.me)
-        print("Going for boost at: ", target_location.data, "Distance to boost: ", distance2D(closestBoost(agent.me), agent.me.location))
-        print("Distance from ball: ", distance2D(agent.me.location, agent.ball.location))
-        if agent.me.boost > 50:
+        #print("Going for boost at: ", target_location.data, "Distance to boost: ", distance2D(closestBoost(agent.me), agent.me.location))
+        #print("Distance from ball: ", distance2D(agent.me.location, agent.ball.location))
+        if agent.me.boost > 80:
             print("Got boost :)")
             self.expired = True
 
@@ -202,6 +205,7 @@ def exampleController(agent, target_object,target_speed):
     current_speed = velocity2D(agent.me)
     #steering
     controller_state.steer = steer(angle_to_ball)
+
 
     #throttle
     if target_speed > current_speed:

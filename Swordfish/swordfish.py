@@ -1,7 +1,7 @@
 import math
 import time
-from Util import *
-from States import *
+from util import *
+from states import *
 
 from rlbot.agents.base_agent import BaseAgent, SimpleControllerState
 from rlbot.utils.structures.game_data_struct import GameTickPacket
