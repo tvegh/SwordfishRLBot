@@ -32,6 +32,17 @@ class Swordfish(BaseAgent):
         self.checkState()
         return self.state.execute(self)
 
+        # self.renderer.begin_rendering()
+        # self.renderer.draw_line_3d([0,0,10],[0,100,10],self.renderer.white())
+        # self.renderer.end_rendering()
+
+
+        # #MAKE BOT NOT MOVE
+        # controller_state = SimpleControllerState()
+        # controller_state.throttle = 0
+        # return controller_state
+        # #MAKE BOT NOT MOVE
+
     def preprocess(self,game):
         self.me.location.data = [game.game_cars[self.index].physics.location.x,game.game_cars[self.index].physics.location.y,game.game_cars[self.index].physics.location.z]
         self.me.velocity.data = [game.game_cars[self.index].physics.velocity.x,game.game_cars[self.index].physics.velocity.y,game.game_cars[self.index].physics.velocity.z]

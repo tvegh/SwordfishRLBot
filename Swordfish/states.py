@@ -86,7 +86,7 @@ def calcController(agent, target_object,target_speed):
     angle_to_ball = math.atan2(location.data[1],location.data[0])
 
     current_speed = velocity2D(agent.me)
-    controller_state.steer = steer(angle_to_ball)
+    controller_state.steer = steer(angle_to_ball, controller_state, target_object, agent)
 
     #throttle
     if target_speed > current_speed:
@@ -107,7 +107,7 @@ def shotController(agent, target_object,target_speed):
 
     current_speed = velocity2D(agent.me)
     #steering
-    controller_state.steer = steer(angle_to_target)
+    controller_state.steer = steer(angle_to_target, controller_state, target_object, agent)
 
     #throttle
     if target_speed > 1400 and target_speed > current_speed and agent.start > 2.5 and current_speed < 2250:
@@ -150,7 +150,7 @@ def exampleController(agent, target_object,target_speed):
 
     current_speed = velocity2D(agent.me)
     #steering
-    controller_state.steer = steer(angle_to_ball)
+    controller_state.steer = steer(angle_to_ball, controller_state, target_object, agent)
 
     #throttle
     if target_speed > current_speed:

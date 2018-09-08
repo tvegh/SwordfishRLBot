@@ -1,4 +1,5 @@
 import math
+from rlbot.agents.base_agent import BaseAgent, SimpleControllerState
 
 GOAL_WIDTH = 1900
 FIELD_LENGTH = 10280
@@ -95,8 +96,13 @@ def cap(x, low, high):
     else:
         return x
 
-def steer(angle):
+def steer(angle, controller_state, target_object, agent):
     final = ((10 * angle+sign(angle))**3) / 20
+    distance_to_ball = distance2D(target_object, agent.me)
+    if abs(angle) > (math.pi/2) and abs(angle) < ((3*math.pi)/4) and distance_to_ball > 200:
+        controller_state.handbrake = True
+    else:
+        controller_state.handbrake = False
     return cap(final,-1,1)
 
 def angle2(target_location,object_location):
