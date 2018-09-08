@@ -6,9 +6,7 @@ from states import *
 from rlbot.agents.base_agent import BaseAgent, SimpleControllerState
 from rlbot.utils.structures.game_data_struct import GameTickPacket
 
-
 global ALL_PLAYERS
-
 
 class Swordfish(BaseAgent):
 
@@ -31,9 +29,6 @@ class Swordfish(BaseAgent):
             else:
                 self.state = quickShot()
                 #self.state = goForBoost()
-            else:
-                self.state = quickShot()
-
 
     def get_output(self, game: GameTickPacket) -> SimpleControllerState:
         self.preprocess(game)

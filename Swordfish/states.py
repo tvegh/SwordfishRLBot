@@ -114,8 +114,8 @@ class goForBoost:   #go for boost boost < some value, AND if, distances: from bo
                 closestPlayer = player
         #print("Closest player: ", closestPlayer.name)
         #print(botToBoost, "||", botToBall)
-        #if botToBoost < botToBall and closestPlayer.team == agent.team and agent.me.boost < 60:
-        if botToBoost < botToBall and closestPlayer.team == agent.team and agent.me.boost < 60:
+        #if botToBoost < botToBall and closestPlayer.team == agent.team and agent.me.boost < 30:
+        if botToBoost < botToBall and closestPlayer.team == agent.team and agent.me.boost < 30:
             return True
         return False
 
@@ -138,7 +138,7 @@ def boostController(agent, target_object):
     controller_state = SimpleControllerState()
     angle_to_ball = math.atan2(location.data[1],location.data[0])
     current_speed = velocity2D(agent.me)
-    controller_state.steer = steer(angle_to_ball)
+    controller_state.steer = steer(angle_to_ball, controller_state, target_object, agent)
     controller_state.throttle = 1.0
     controller_state.boost = True
     return controller_state
@@ -149,7 +149,7 @@ def calcController(agent, target_object,target_speed):
     angle_to_ball = math.atan2(location.data[1],location.data[0])
 
     current_speed = velocity2D(agent.me)
-    
+
     controller_state.steer = steer(angle_to_ball, controller_state, target_object, agent)
 
     #throttle
