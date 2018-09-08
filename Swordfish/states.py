@@ -98,7 +98,7 @@ class goForBoost:   #go for boost boost < some value, AND if, distances: from bo
     def available(self, agent):
         myLoc = agent.me.location
         ballLoc = agent.ball.location
-        boostLoc = closestBoost(agent.me)
+        boostLoc = closestBoost(agent)
 
         botToBoost = distance2D(boostLoc, myLoc)
         boostToBall = distance2D(boostLoc, ballLoc)
@@ -122,7 +122,7 @@ class goForBoost:   #go for boost boost < some value, AND if, distances: from bo
  #if distance2D(boostLoc, myLoc) <= 4000 and agent.me.boost < 30 and distance2D(myLoc, ballLoc) > 500:
     def execute(self,agent):
         agent.controller = boostController
-        target_location = closestBoost(agent.me)
+        target_location = closestBoost(agent)
         #print("Going for boost at: ", target_location.data, "Distance to boost: ", distance2D(closestBoost(agent.me), agent.me.location))
         #print("Distance from ball: ", distance2D(agent.me.location, agent.ball.location))
         if agent.me.boost > 80:

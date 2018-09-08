@@ -1,5 +1,6 @@
 import math
-from rlbot.agents.base_agent import BaseAgent, SimpleControllerState
+import swordfish
+
 
 GOAL_WIDTH = 1900
 FIELD_LENGTH = 10280
@@ -133,22 +134,12 @@ def distance2D(target_object, our_object):
 
 
 def closestBoost(agent):
-    file = open("BigBoostLocs.txt", 'r+') #open file for big boost pads
-    Locs = file.read()               #read file
-    Coords = Locs.split('\n')        #split lines into list
     minDistance = 1000000
-    boostCoordinates = [0.0, 0.0, 0.0]
-    for c in Coords:
-        string = c[1:len(c)-1]       #remove brackets
-        string = string.split(',')   #separate x,y,z coordinates
-
-        boostX = float(string[0])    #convert text strings
-        boostY = float(string[1])    #to float
-        boostZ = float(string[2])    #coordinate values
-
-        thisDistance = distance2D([boostX, boostY, boostZ], agent.location.data)
+    for pad in swordfish.ALL_BOOST_PADS:
+        padVector = [pad.location.x, pad.location.y, pad.location.z]
+        thisDistance = distance2D(padVector, agent.me.location)
         if thisDistance < minDistance:
             minDistance = thisDistance
-            boostCoordinates = [boostX, boostY, boostZ]
+            boostCoordinates = padVector
 
     return Vector3(boostCoordinates)
