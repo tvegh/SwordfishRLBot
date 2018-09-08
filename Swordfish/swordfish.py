@@ -7,6 +7,9 @@ from rlbot.agents.base_agent import BaseAgent, SimpleControllerState
 from rlbot.utils.structures.game_data_struct import GameTickPacket
 
 
+global ALL_PLAYERS
+
+
 class Swordfish(BaseAgent):
 
     def initialize_agent(self):
@@ -23,6 +26,11 @@ class Swordfish(BaseAgent):
                 self.state = calcShot()
             elif quickShot().available(self) == True:
                 self.state = quickShot()
+            elif goForBoost().available(self) == True:
+                self.state = goForBoost()
+            else:
+                self.state = quickShot()
+                #self.state = goForBoost()
             else:
                 self.state = quickShot()
 
@@ -31,6 +39,7 @@ class Swordfish(BaseAgent):
         self.preprocess(game)
         self.checkState()
         return self.state.execute(self)
+
 
         # self.renderer.begin_rendering()
         # self.renderer.draw_line_3d([0,0,10],[0,100,10],self.renderer.white())
@@ -44,6 +53,7 @@ class Swordfish(BaseAgent):
         # #MAKE BOT NOT MOVE
 
     def preprocess(self,game):
+        global ALL_PLAYERS
         self.me.location.data = [game.game_cars[self.index].physics.location.x,game.game_cars[self.index].physics.location.y,game.game_cars[self.index].physics.location.z]
         self.me.velocity.data = [game.game_cars[self.index].physics.velocity.x,game.game_cars[self.index].physics.velocity.y,game.game_cars[self.index].physics.velocity.z]
         self.me.rotation.data = [game.game_cars[self.index].physics.rotation.pitch,game.game_cars[self.index].physics.rotation.yaw,game.game_cars[self.index].physics.rotation.roll]
@@ -55,5 +65,9 @@ class Swordfish(BaseAgent):
         self.ball.velocity.data = [game.game_ball.physics.velocity.x,game.game_ball.physics.velocity.y,game.game_ball.physics.velocity.z]
         self.ball.rotation.data = [game.game_ball.physics.rotation.pitch,game.game_ball.physics.rotation.yaw,game.game_ball.physics.rotation.roll]
         self.ball.rvelocity.data = [game.game_ball.physics.angular_velocity.x,game.game_ball.physics.angular_velocity.y,game.game_ball.physics.angular_velocity.z]
+
+
+        self.ball.local_location = to_local(self.ball,self.me)
+        ALL_PLAYERS = game.game_cars
 
         self.ball.local_location = to_local(self.ball,self.me)

@@ -2,7 +2,7 @@ import math
 import time
 from rlbot.agents.base_agent import  SimpleControllerState
 from util import *
-
+import swordfish
 
 class calcShot:
     def __init__(self):
@@ -30,6 +30,7 @@ class calcShot:
         target_local = toLocal(target_location,agent.me)
         angle_to_target = math.atan2(target_local.data[1], target_local.data[0])
         distance_to_target = distance2D(agent.me, target_location)
+
         ball_distance_x = abs(target_location.data[0] - agent.me.location.data[0])
         ball_distance_y = abs(target_location.data[1] - agent.me.location.data[1])
 
@@ -72,6 +73,7 @@ class quickShot:
         location = toLocal(target_location,agent.me)
         angle_to_target = math.atan2(location.data[1],location.data[0])
         distance_to_target = distance2D(agent.me, target_location)
+
         ball_distance_x = abs(target_location.data[0] - agent.me.location.data[0])
         ball_distance_y = abs(target_location.data[1] - agent.me.location.data[1])
 
@@ -87,12 +89,67 @@ class quickShot:
 
         return agent.controller(agent,target_location, speed)
 
+
+class goForBoost:   #go for boost boost < some value, AND if, distances: from bot to boost < from boost to ball < from bot to boost + from bot to other player
+
+    def __init__(self):
+        self.expired = False
+
+    def available(self, agent):
+        myLoc = agent.me.location
+        ballLoc = agent.ball.location
+        boostLoc = closestBoost(agent.me)
+
+        botToBoost = distance2D(boostLoc, myLoc)
+        boostToBall = distance2D(boostLoc, ballLoc)
+        botToBall = distance2D(ballLoc, myLoc)
+
+        lowestDistanceToBall = 1000000
+        for player in swordfish.ALL_PLAYERS:
+            playerLoc = player.physics.location
+            playerVector = [playerLoc.x, playerLoc.y, playerLoc.z]
+            playerToBall = distance2D(ballLoc, playerVector)
+            if playerToBall < lowestDistanceToBall:
+                lowestDistanceToBall = playerToBall
+                closestPlayer = player
+        #print("Closest player: ", closestPlayer.name)
+        #print(botToBoost, "||", botToBall)
+        #if botToBoost < botToBall and closestPlayer.team == agent.team and agent.me.boost < 60:
+        if botToBoost < botToBall and closestPlayer.team == agent.team and agent.me.boost < 60:
+            return True
+        return False
+
+ #if distance2D(boostLoc, myLoc) <= 4000 and agent.me.boost < 30 and distance2D(myLoc, ballLoc) > 500:
+    def execute(self,agent):
+        agent.controller = boostController
+        target_location = closestBoost(agent.me)
+        #print("Going for boost at: ", target_location.data, "Distance to boost: ", distance2D(closestBoost(agent.me), agent.me.location))
+        #print("Distance from ball: ", distance2D(agent.me.location, agent.ball.location))
+        if agent.me.boost > 80:
+            print("Got boost :)")
+            self.expired = True
+
+        return agent.controller(agent,target_location)
+
+
+
+def boostController(agent, target_object):
+    location = toLocal(target_object,agent.me)
+    controller_state = SimpleControllerState()
+    angle_to_ball = math.atan2(location.data[1],location.data[0])
+    current_speed = velocity2D(agent.me)
+    controller_state.steer = steer(angle_to_ball)
+    controller_state.throttle = 1.0
+    controller_state.boost = True
+    return controller_state
+
 def calcController(agent, target_object,target_speed):
     location = toLocal(target_object,agent.me)
     controller_state = SimpleControllerState()
     angle_to_ball = math.atan2(location.data[1],location.data[0])
 
     current_speed = velocity2D(agent.me)
+    
     controller_state.steer = steer(angle_to_ball, controller_state, target_object, agent)
 
     #throttle

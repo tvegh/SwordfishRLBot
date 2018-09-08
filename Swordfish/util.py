@@ -130,3 +130,25 @@ def toLocation(target):
 def distance2D(target_object, our_object):
     difference = toLocation(target_object) - toLocation(our_object)
     return math.sqrt(difference.data[0]**2 + difference.data[1]**2)
+
+
+def closestBoost(agent):
+    file = open("BigBoostLocs.txt", 'r+') #open file for big boost pads
+    Locs = file.read()               #read file
+    Coords = Locs.split('\n')        #split lines into list
+    minDistance = 1000000
+    boostCoordinates = [0.0, 0.0, 0.0]
+    for c in Coords:
+        string = c[1:len(c)-1]       #remove brackets
+        string = string.split(',')   #separate x,y,z coordinates
+
+        boostX = float(string[0])    #convert text strings
+        boostY = float(string[1])    #to float
+        boostZ = float(string[2])    #coordinate values
+
+        thisDistance = distance2D([boostX, boostY, boostZ], agent.location.data)
+        if thisDistance < minDistance:
+            minDistance = thisDistance
+            boostCoordinates = [boostX, boostY, boostZ]
+
+    return Vector3(boostCoordinates)
