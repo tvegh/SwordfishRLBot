@@ -7,6 +7,7 @@ from rlbot.agents.base_agent import BaseAgent, SimpleControllerState
 from rlbot.utils.structures.game_data_struct import GameTickPacket
 
 global ALL_PLAYERS
+global ALL_BOOST_PADS
 
 class Swordfish(BaseAgent):
 
@@ -38,6 +39,7 @@ class Swordfish(BaseAgent):
 
     def preprocess(self,game):
         global ALL_PLAYERS
+        global ALL_BOOST_PADS
         self.me.location.data = [game.game_cars[self.index].physics.location.x,game.game_cars[self.index].physics.location.y,game.game_cars[self.index].physics.location.z]
         self.me.velocity.data = [game.game_cars[self.index].physics.velocity.x,game.game_cars[self.index].physics.velocity.y,game.game_cars[self.index].physics.velocity.z]
         self.me.rotation.data = [game.game_cars[self.index].physics.rotation.pitch,game.game_cars[self.index].physics.rotation.yaw,game.game_cars[self.index].physics.rotation.roll]
@@ -52,3 +54,11 @@ class Swordfish(BaseAgent):
 
         self.ball.local_location = to_local(self.ball,self.me)
         ALL_PLAYERS = game.game_cars
+        ALL_BOOST_PADS = []
+        pads = self.get_field_info().boost_pads
+        #print("____________________________________________")
+        for pad in pads:
+            if pad.is_full_boost:
+                ALL_BOOST_PADS.append(pad)
+            #    print(pad.location.x, pad.location.y,pad.location.z)
+    #    print("____________________________________________")
