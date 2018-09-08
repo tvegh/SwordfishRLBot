@@ -4,6 +4,24 @@ from rlbot.agents.base_agent import  SimpleControllerState
 from util import *
 import swordfish
 
+class kickoffShot:
+    def __init__(self):
+        self.expired = False
+
+    def available(self, agent):
+        if swordfish.KICKOFF == True:
+            return True
+        return False
+
+    def execute(self, agent):
+        agent.controller = kickoffController
+
+        if swordfish.KICKOFF == False:
+            self.expired = True
+
+        return agent.controller(agent, agent.ball)
+
+
 class calcShot:
     def __init__(self):
         self.expired = False
@@ -132,6 +150,29 @@ class goForBoost:   #go for boost boost < some value, AND if, distances: from bo
         return agent.controller(agent,target_location)
 
 
+
+def kickoffController(agent, target_object):
+    location = toLocal(target_object, agent.me)
+    controller_state = SimpleControllerState()
+    angle_to_ball = math.atan2(location.data[1],location.data[0])
+    controller_state.steer = steer(angle_to_ball, controller_state, target_object, agent)
+    controller_state.throttle = 1.0
+    controller_state.boost = True
+    if agent.me.boost == 0:
+        time_difference = time.time() - agent.start
+        if time_difference > 2.2:
+            agent.start = time.time()
+        elif time_difference <= 0.1:
+            controller_state.jump = True
+            controller_state.pitch = -1
+        elif time_difference >= 0.1 and time_difference <= 0.15:
+            controller_state.jump = False
+            controller_state.pitch = -1
+        elif time_difference > 0.15 and time_difference < 1:
+            controller_state.jump = True
+            controller_state.yaw = controller_state.steer
+            controller_state.pitch = -1
+    return controller_state
 
 def boostController(agent, target_object):
     #print('boost controller')

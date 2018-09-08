@@ -8,6 +8,7 @@ from rlbot.utils.structures.game_data_struct import GameTickPacket
 
 global ALL_PLAYERS
 global ALL_BOOST_PADS
+global KICKOFF
 
 class Swordfish(BaseAgent):
 
@@ -16,12 +17,16 @@ class Swordfish(BaseAgent):
         self.ball = obj()
         self.start = time.time()
 
-        self.state = calcShot()
-        self.controller = calcController
+        self.state = kickoffShot()
+        self.controller = kickoffController
 
     def checkState(self):
+        if KICKOFF == True:
+            self.state.expired = True
         if self.state.expired:
-            if calcShot().available(self) == True:
+            if kickoffShot().available(self) == True:
+                self.state = kickoffShot()
+            elif calcShot().available(self) == True:
                 self.state = calcShot()
             elif quickShot().available(self) == True:
                 self.state = quickShot()
@@ -34,6 +39,7 @@ class Swordfish(BaseAgent):
     def get_output(self, game: GameTickPacket) -> SimpleControllerState:
         self.preprocess(game)
         self.checkState()
+        print(self.state)
         return self.state.execute(self)
 
 
@@ -51,6 +57,7 @@ class Swordfish(BaseAgent):
     def preprocess(self,game):
         global ALL_PLAYERS
         global ALL_BOOST_PADS
+        global KICKOFF
         self.me.location.data = [game.game_cars[self.index].physics.location.x,game.game_cars[self.index].physics.location.y,game.game_cars[self.index].physics.location.z]
         self.me.velocity.data = [game.game_cars[self.index].physics.velocity.x,game.game_cars[self.index].physics.velocity.y,game.game_cars[self.index].physics.velocity.z]
         self.me.rotation.data = [game.game_cars[self.index].physics.rotation.pitch,game.game_cars[self.index].physics.rotation.yaw,game.game_cars[self.index].physics.rotation.roll]
@@ -65,6 +72,7 @@ class Swordfish(BaseAgent):
 
 
         self.ball.local_location = to_local(self.ball,self.me)
+        KICKOFF = game.game_info.is_kickoff_pause
         ALL_PLAYERS = game.game_cars
         ALL_BOOST_PADS = []
         pads = self.get_field_info().boost_pads
