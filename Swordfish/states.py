@@ -134,6 +134,7 @@ class goForBoost:   #go for boost boost < some value, AND if, distances: from bo
 
 
 def boostController(agent, target_object):
+    print('boost controller')
     location = toLocal(target_object,agent.me)
     controller_state = SimpleControllerState()
     angle_to_ball = math.atan2(location.data[1],location.data[0])
@@ -144,6 +145,7 @@ def boostController(agent, target_object):
     return controller_state
 
 def calcController(agent, target_object,target_speed):
+    print('calc controller')
     location = toLocal(target_object,agent.me)
     controller_state = SimpleControllerState()
     angle_to_ball = math.atan2(location.data[1],location.data[0])
@@ -162,6 +164,7 @@ def calcController(agent, target_object,target_speed):
     return controller_state
 
 def shotController(agent, target_object,target_speed):
+    print('shot controller')
     goal_local = toLocal([0,-sign(agent.team)*FIELD_LENGTH/2,100],agent.me)
     goal_angle = math.atan2(goal_local.data[1],goal_local.data[0])
 
@@ -183,18 +186,32 @@ def shotController(agent, target_object,target_speed):
 
     #dodging
     time_difference = time.time() - agent.start
-    if ballReady(agent) and time_difference > 2.2 and distance2D(target_object,agent.me) <= 270:
-        agent.start = time.time()
-    elif time_difference <= 0.1:
-        controller_state.jump = True
-        controller_state.pitch = -1
-    elif time_difference >= 0.1 and time_difference <= 0.15:
-        controller_state.jump = False
-        controller_state.pitch = -1
-    elif time_difference > 0.15 and time_difference < 1:
-        controller_state.jump = True
-        controller_state.yaw = math.sin(goal_angle)
-        controller_state.pitch = -abs(math.cos(goal_angle))
+    if distance2D(target_object, agent.me) > 1000:
+        if time_difference > 2.2:
+            agent.start = time.time()
+        elif time_difference <= 0.1:
+            controller_state.jump = True
+            controller_state.pitch = -1
+        elif time_difference >= 0.1 and time_difference <= 0.15:
+            controller_state.jump = False
+            controller_state.pitch = -1
+        elif time_difference > 0.15 and time_difference < 1:
+            controller_state.jump = True
+            controller_state.yaw = controller_state.steer
+            controller_state.pitch = -abs(math.cos(goal_angle))
+    else:
+        if ballReady(agent) and time_difference > 2.2 and distance2D(target_object,agent.me) <= 270:
+            agent.start = time.time()
+        elif time_difference <= 0.1:
+            controller_state.jump = True
+            controller_state.pitch = -1
+        elif time_difference >= 0.1 and time_difference <= 0.15:
+            controller_state.jump = False
+            controller_state.pitch = -1
+        elif time_difference > 0.15 and time_difference < 1:
+            controller_state.jump = True
+            controller_state.yaw = math.sin(goal_angle)
+            controller_state.pitch = -abs(math.cos(goal_angle))
 
     return controller_state
 
