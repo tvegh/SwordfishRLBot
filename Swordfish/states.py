@@ -1,7 +1,6 @@
 import math
 import time
 from rlbot.agents.base_agent import  SimpleControllerState
-from rlbot.utils.structures.game_data_struct import GameTickPacket
 from util import *
 import swordfish
 
@@ -31,8 +30,14 @@ class calcShot:
         target_local = toLocal(target_location,agent.me)
         angle_to_target = math.atan2(target_local.data[1], target_local.data[0])
         distance_to_target = distance2D(agent.me, target_location)
+
+        ball_distance_x = abs(target_location.data[0] - agent.me.location.data[0])
+        ball_distance_y = abs(target_location.data[1] - agent.me.location.data[1])
+
         speedCorrection =  ((1+ abs(angle_to_target)**2) * 300)
         speed = 2300 - speedCorrection + cap((distance_to_target/16)**2,0,speedCorrection)
+        if target_location.data[2] > 200 and ball_distance_x < 500 and ball_distance_y < 500:
+            speed = speed/2
 
         if ballProject(agent) < 10:
             self.expired = True
@@ -69,10 +74,13 @@ class quickShot:
         angle_to_target = math.atan2(location.data[1],location.data[0])
         distance_to_target = distance2D(agent.me, target_location)
 
+        ball_distance_x = abs(target_location.data[0] - agent.me.location.data[0])
+        ball_distance_y = abs(target_location.data[1] - agent.me.location.data[1])
+
         speedCorrection =  ((1+ abs(angle_to_target)**2) * 300)
         speed = 2000 - speedCorrection + cap((distance_to_target/16)**2,0,speedCorrection)
-
-
+        if target_location.data[2] > 200 and ball_distance_x < 500 and ball_distance_y < 500:
+            speed = speed/2
 
         if distance2D(agent.me.location,agent.ball.location) < 400 and abs(angle_to_target) > 2:
             self.expired = True
@@ -80,6 +88,7 @@ class quickShot:
             self.expired = True
 
         return agent.controller(agent,target_location, speed)
+
 
 class goForBoost:   #go for boost boost < some value, AND if, distances: from bot to boost < from boost to ball < from bot to boost + from bot to other player
 
@@ -140,7 +149,8 @@ def calcController(agent, target_object,target_speed):
     angle_to_ball = math.atan2(location.data[1],location.data[0])
 
     current_speed = velocity2D(agent.me)
-    controller_state.steer = steer(angle_to_ball)
+    
+    controller_state.steer = steer(angle_to_ball, controller_state, target_object, agent)
 
     #throttle
     if target_speed > current_speed:
@@ -161,7 +171,7 @@ def shotController(agent, target_object,target_speed):
 
     current_speed = velocity2D(agent.me)
     #steering
-    controller_state.steer = steer(angle_to_target)
+    controller_state.steer = steer(angle_to_target, controller_state, target_object, agent)
 
     #throttle
     if target_speed > 1400 and target_speed > current_speed and agent.start > 2.5 and current_speed < 2250:
@@ -204,8 +214,7 @@ def exampleController(agent, target_object,target_speed):
 
     current_speed = velocity2D(agent.me)
     #steering
-    controller_state.steer = steer(angle_to_ball)
-
+    controller_state.steer = steer(angle_to_ball, controller_state, target_object, agent)
 
     #throttle
     if target_speed > current_speed:
