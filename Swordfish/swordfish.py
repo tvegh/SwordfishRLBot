@@ -24,7 +24,7 @@ class Swordfish(BaseAgent):
                 self.state = calcShot()
             elif quickShot().available(self) == True:
                 self.state = quickShot()
-            elif goForBoost().available(ALL_PLAYERS, self) == True:
+            elif goForBoost().available(self) == True:
                 self.state = goForBoost()
             else:
                 self.state = quickShot()

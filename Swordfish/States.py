@@ -106,6 +106,7 @@ class goForBoost:   #go for boost boost < some value, AND if, distances: from bo
         if botToBoost < botToBall and closestPlayer.team == agent.me.team and agent.me.boost < 30:
             return True
         return False
+
  #if distance2D(boostLoc, myLoc) <= 4000 and agent.me.boost < 30 and distance2D(myLoc, ballLoc) > 500:
     def execute(self,agent):
         agent.controller = boostController
