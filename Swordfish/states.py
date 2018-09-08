@@ -134,7 +134,7 @@ class goForBoost:   #go for boost boost < some value, AND if, distances: from bo
 
 
 def boostController(agent, target_object):
-    print('boost controller')
+    #print('boost controller')
     location = toLocal(target_object,agent.me)
     controller_state = SimpleControllerState()
     angle_to_ball = math.atan2(location.data[1],location.data[0])
@@ -142,10 +142,11 @@ def boostController(agent, target_object):
     controller_state.steer = steer(angle_to_ball, controller_state, target_object, agent)
     controller_state.throttle = 1.0
     controller_state.boost = True
+    checkForRoll(agent, controller_state)
     return controller_state
 
 def calcController(agent, target_object,target_speed):
-    print('calc controller')
+    #print('calc controller')
     location = toLocal(target_object,agent.me)
     controller_state = SimpleControllerState()
     angle_to_ball = math.atan2(location.data[1],location.data[0])
@@ -161,10 +162,13 @@ def calcController(agent, target_object,target_speed):
             controller_state.boost = True
     elif target_speed < current_speed:
         controller_state.throttle = -1.0
+
+    checkForRoll(agent, controller_state)
+
     return controller_state
 
 def shotController(agent, target_object,target_speed):
-    print('shot controller')
+    #print('shot controller')
     goal_local = toLocal([0,-sign(agent.team)*FIELD_LENGTH/2,100],agent.me)
     goal_angle = math.atan2(goal_local.data[1],goal_local.data[0])
 
@@ -198,7 +202,7 @@ def shotController(agent, target_object,target_speed):
         elif time_difference > 0.15 and time_difference < 1:
             controller_state.jump = True
             controller_state.yaw = controller_state.steer
-            controller_state.pitch = -abs(math.cos(goal_angle))
+            controller_state.pitch = -1
     else:
         if ballReady(agent) and time_difference > 2.2 and distance2D(target_object,agent.me) <= 270:
             agent.start = time.time()
@@ -213,6 +217,7 @@ def shotController(agent, target_object,target_speed):
             controller_state.yaw = math.sin(goal_angle)
             controller_state.pitch = -abs(math.cos(goal_angle))
 
+    checkForRoll(agent, controller_state)
     return controller_state
 
 class exampleATBA:

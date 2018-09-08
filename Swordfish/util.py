@@ -1,4 +1,5 @@
 import math
+import time
 import swordfish
 
 
@@ -143,3 +144,18 @@ def closestBoost(agent):
             boostCoordinates = padVector
 
     return Vector3(boostCoordinates)
+
+def checkForRoll(agent, controller_state):
+    time_difference = time.time() - agent.start
+    #check if dodging
+    if time_difference > 1:
+        #rotate car back to 0, with 0.2 tolerance
+        if agent.me.rotation.data[2] > 0.05:
+            controller_state.roll = -1
+        elif agent.me.rotation.data[2] < -0.05:
+            controller_state.roll = 1
+        #pitch car back to 0
+        if agent.me.rotation.data[0] > 0.05:
+            controller_state.pitch = -1
+        elif agent.me.rotation.data[0] < 0.05:
+            controller_state.pitch = 1
